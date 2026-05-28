@@ -34,7 +34,9 @@ public class Tile{
 	}
 	
 	
-	
+	public void setImage(BufferedImage i) {
+		image = i;
+	}
 	//------------------------------------Getters
 	public boolean isSolid() {
 		return solid;

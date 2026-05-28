@@ -169,8 +169,8 @@ public class Level {
 				if (flowers.get(i).getHitbox().isIntersecting(player.getHitbox())) {
 					if(flowers.get(i).getType() == 1)
 						water(flowers.get(i).getCol(), flowers.get(i).getRow(), map, 3);
-//					else
-//						addGas(flowers.get(i).getCol(), flowers.get(i).getRow(), map, 20, new ArrayList<Gas>());
+					else
+/						addGas(flowers.get(i).getCol(), flowers.get(i).getRow(), map, 20, new ArrayList<Gas>());
 					flowers.remove(i);
 					i--;
 				}
@@ -192,7 +192,43 @@ public class Level {
 		}
 	}
 	
-	
+	private void waterSlowed(Water w) {
+		if(w.getFullness()==0) {
+			if (w.getRow()+2 < map.getTiles()[0].length && !(map.getTiles()[w.getCol()][w.getRow()+1] instanceof Water) && !map.getTiles()[w.getCol()][w.getRow()+1].isSolid() && map.getTiles()[w.getCol()][w.getRow()+2].isSolid()) {
+				water(w.getCol(), w.getRow()+1, map, 3);
+			}
+			else if (w.getRow()+1 < map.getTiles()[0].length && !(map.getTiles()[w.getCol()][w.getRow()+1] instanceof Water) && !map.getTiles()[w.getCol()][w.getRow()+1].isSolid()){
+				water(w.getCol(), w.getRow()+1, map, w.getFullness());
+			}
+		}
+		else {
+			if (w.getRow()+2 < map.getTiles()[0].length && !(map.getTiles()[w.getCol()][w.getRow()+1] instanceof Water) && !map.getTiles()[w.getCol()][w.getRow()+1].isSolid() && map.getTiles()[w.getCol()][w.getRow()+2].isSolid()) {
+				water(w.getCol(), w.getRow()+1, map, 3);
+			}
+			else if (w.getRow()+1 < map.getTiles()[0].length && !(map.getTiles()[w.getCol()][w.getRow()+1] instanceof Water) && !map.getTiles()[w.getCol()]w.getRow()+1].isSolid()){
+				water(w.getCol(), w.getRow()+1, map, 0);
+			}
+			else{
+				if(w.getCol()+1<map.getTiles().length && !(map.getTiles()[w.getCol()+1][w.getRow()] instanceof Water) && !map.getTiles()[w.getCol()+1][w.getRow()].isSolid() && !(map.getTiles()[w.getCol()][w.getRow()+1] instanceof Water)) {
+					if(w.getFullness()==1) {
+						water(w.getCol()+1, w.getRow(), map, w.getFullness());
+					}
+					else {
+						water(w.getCol()+1, w.getRow(), map, w.getFullness()-1);
+					}
+				}
+				if(w.getCol()-1>=0 && !(map.getTiles()[w.getCol()][w.getRow()] instanceof Water) && !map.getTiles()[w.getCol()-1][w.getRow()].isSolid() ) {
+					if(w.getFullness()==1) {
+						water(w.getCol()-1, w.getRow(), map, w.getFullness());
+					}
+					else {
+						water(w.getCol()-1, w.getRow(), map, w.getFullness()-1);
+					}
+				}
+			}
+			
+		}
+	}
 	//#############################################################################################################
 	//Your code goes here! 
 	//Please make sure you read the rubric/directions carefully and implement the solution recursively!
@@ -214,19 +250,22 @@ public class Level {
 			map.addTile(col, row, w);
 		}
 		if(fullness==0) {
-			if (row+1 < map.getTiles()[0].length && !(map.getTiles()[col][row+1] instanceof Water) && !map.getTiles()[col][row+1].isSolid()){
+			if (row+2 < map.getTiles()[0].length && !(map.getTiles()[col][row+1] instanceof Water) && !map.getTiles()[col][row+1].isSolid() && map.getTiles()[col][row+2].isSolid()) {
+				water(col, row+1, map, 3);
+			}
+			else if (row+1 < map.getTiles()[0].length && !(map.getTiles()[col][row+1] instanceof Water) && !map.getTiles()[col][row+1].isSolid()){
 				water(col, row+1, map, fullness);
 			}
 		}
 		else {
-			if (row+1 < map.getTiles()[0].length && !(map.getTiles()[col][row+1] instanceof Water) && !map.getTiles()[col][row+1].isSolid()){
+			if (row+2 < map.getTiles()[0].length && !(map.getTiles()[col][row+1] instanceof Water) && !map.getTiles()[col][row+1].isSolid() && map.getTiles()[col][row+2].isSolid()) {
+				water(col, row+1, map, 3);
+			}
+			else if (row+1 < map.getTiles()[0].length && !(map.getTiles()[col][row+1] instanceof Water) && !map.getTiles()[col][row+1].isSolid()){
 				water(col, row+1, map, 0);
 			}
-			else if (row+1 < map.getTiles()[0].length && !map.getTiles()[col][row+1].isSolid()) {
-
-			}
 			else{
-				if(col+1<map.getTiles().length && !(map.getTiles()[col+1][row] instanceof Water) && !map.getTiles()[col+1][row].isSolid()) {
+				if(col+1<map.getTiles().length && !(map.getTiles()[col+1][row] instanceof Water) && !map.getTiles()[col+1][row].isSolid() && !(map.getTiles()[col][row+1] instanceof Water)) {
 					if(fullness==1) {
 						water(col+1, row, map, fullness);
 					}
@@ -234,7 +273,7 @@ public class Level {
 						water(col+1, row, map, fullness-1);
 					}
 				}
-				if(col-1>=0 && !(map.getTiles()[col-1][row] instanceof Water) && !map.getTiles()[col-1][row].isSolid()) {
+				if(col-1>=0 && !(map.getTiles()[col-1][row] instanceof Water) && !map.getTiles()[col-1][row].isSolid() ) {
 					if(fullness==1) {
 						water(col-1, row, map, fullness);
 					}
@@ -246,36 +285,92 @@ public class Level {
 			
 		}
 	}
+	
+	private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<Gas> placedThisRound) {
+		ArrayList<Integer> gasRows = new ArrayList<>();
+		ArrayList<Integer> gasCols = new ArrayList<>();
+		int count = 0;
+		int rowMod = 0;
+		int colMod = 0;
+		boolean canSpread = true;
+		while(canSpread && count<numSquaresToFill) {
+			for(int i = 0; i < 3; i++) {
+				for(int k = 0; k< 3; k++) {
+					rowMod = i-1;
+					colMod = k * (int)(Math.pow(-1.0, k+1.0));
+					if(gasRows.get(count) + rowMod >=0 && gasRows.get(count) + rowMod <map.getTiles()[0].length && gasCols.get(count) + colMod >=0 && gasCols.get(count) + colMod <map.getTiles().length && (i != 1 && k!= 0)) {
+						if(!(map.getTiles()[gasCols.get(count) + colMod][gasRows.get(count) + rowMod] instanceof Water) && !(map.getTiles()[gasCols.get(count) + colMod][gasRows.get(count) + rowMod].isSolid()) && !(map.getTiles()[gasCols.get(count) + colMod][gasRows.get(count) + rowMod] instanceof Gas)) {
+							
+						}
+					}
+				}
+			}
+			count++;
+			if(count >= gasRows.size()) {
+				canSpread = false;
+			}
+		}
+	}
 
 
 
 	public void draw(Graphics g) {
-		g.translate((int) -camera.getX(), (int) -camera.getY());
+		 g.translate((int) -camera.getX(), (int) -camera.getY());
+	   	 // Draw the map
+	   	 for (int x = 0; x < map.getWidth(); x++) {
+	   		 for (int y = 0; y < map.getHeight(); y++) {
+	   			 Tile tile = map.getTiles()[x][y];
+	   			 if (tile == null)
+	   				 continue;
+	   			 if(tile instanceof Gas) {
+	   				
+	   				 int adjacencyCount =0;
+	   				 for(int i=-1; i<2; i++) {
+	   					 for(int j =-1; j<2; j++) {
+	   						 if(j!=0 || i!=0) {
+	   							 if((x+i)>=0 && (x+i)<map.getTiles().length && (y+j)>=0 && (y+j)<map.getTiles()[x].length) {
+	   								 if(map.getTiles()[x+i][y+j] instanceof Gas) {
+	   									 adjacencyCount++;
+	   								 }
+	   							 }
+	   						 }
+	   					 }
+	   				 }
+	   				 if(adjacencyCount == 8) {
+	   					 ((Gas)(tile)).setIntensity(2);
+	   					 tile.setImage(tileset.getImage("GasThree"));
+	   				 }
+	   				 else if(adjacencyCount >5) {
+	   					 ((Gas)(tile)).setIntensity(1);
+	   					tile.setImage(tileset.getImage("GasTwo"));
+	   				 }
+	   				 else {
+	   					 ((Gas)(tile)).setIntensity(0);
+	   					tile.setImage(tileset.getImage("GasOne"));
+	   				 }
+	   			 }
+	   			 if (camera.isVisibleOnCamera(tile.getX(), tile.getY(), tile.getSize(), tile.getSize()))
+	   				 tile.draw(g);
+	   		 }
+	   	 }
 
-		// Draw the map
-		for (int x = 0; x < map.getWidth(); x++) {
-			for (int y = 0; y < map.getHeight(); y++) {
-				Tile tile = map.getTiles()[x][y];
-				if (tile == null)
-					continue;
-				if (camera.isVisibleOnCamera(tile.getX(), tile.getY(), tile.getSize(), tile.getSize()))
-					tile.draw(g);
-			}
-		}
 
-		// Draw the enemies
-		for (int i = 0; i < enemies.length; i++) {
-			enemies[i].draw(g);
-		}
+	   	 // Draw the enemies
+	   	 for (int i = 0; i < enemies.length; i++) {
+	   		 enemies[i].draw(g);
+	   	 }
 
-		// Draw the player
-		player.draw(g);
 
-		// used for debugging
-		if (Camera.SHOW_CAMERA)
-			camera.draw(g);
+	   	 // Draw the player
+	   	 player.draw(g);
 
-		g.translate((int) +camera.getX(), (int) +camera.getY());
+
+
+
+	   	 // used for debugging
+	   	 if (Camera.SHOW_CAMERA)
+	   		 camera.draw(g);
+	   	 g.translate((int) +camera.getX(), (int) +camera.getY());
 	}
 
 	// --------------------------Die-Listener
