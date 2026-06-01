@@ -170,7 +170,7 @@ public class Level {
 					if(flowers.get(i).getType() == 1)
 						water(flowers.get(i).getCol(), flowers.get(i).getRow(), map, 3);
 					else
-/						addGas(flowers.get(i).getCol(), flowers.get(i).getRow(), map, 20, new ArrayList<Gas>());
+						addGas(flowers.get(i).getCol(), flowers.get(i).getRow(), map, 20, new ArrayList<Gas>());
 					flowers.remove(i);
 					i--;
 				}
@@ -205,7 +205,7 @@ public class Level {
 			if (w.getRow()+2 < map.getTiles()[0].length && !(map.getTiles()[w.getCol()][w.getRow()+1] instanceof Water) && !map.getTiles()[w.getCol()][w.getRow()+1].isSolid() && map.getTiles()[w.getCol()][w.getRow()+2].isSolid()) {
 				water(w.getCol(), w.getRow()+1, map, 3);
 			}
-			else if (w.getRow()+1 < map.getTiles()[0].length && !(map.getTiles()[w.getCol()][w.getRow()+1] instanceof Water) && !map.getTiles()[w.getCol()]w.getRow()+1].isSolid()){
+			else if (w.getRow()+1 < map.getTiles()[0].length && !(map.getTiles()[w.getCol()][w.getRow()+1] instanceof Water) && !map.getTiles()[w.getCol()][w.getRow()+1].isSolid()){
 				water(w.getCol(), w.getRow()+1, map, 0);
 			}
 			else{
@@ -289,23 +289,40 @@ public class Level {
 	private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<Gas> placedThisRound) {
 		ArrayList<Integer> gasRows = new ArrayList<>();
 		ArrayList<Integer> gasCols = new ArrayList<>();
+		Gas h = new Gas(col, row, tileSize, tileset.getImage("GasOne"), this, 0);
+		map.addTile(col, row, h);
 		int count = 0;
 		int rowMod = 0;
 		int colMod = 0;
+		gasRows.add(row);
+		gasCols.add(col);
 		boolean canSpread = true;
-		while(canSpread && count<numSquaresToFill) {
+		int total = 1;
+		while(canSpread && count<numSquaresToFill-1) {
 			for(int i = 0; i < 3; i++) {
 				for(int k = 0; k< 3; k++) {
 					rowMod = i-1;
-					colMod = k * (int)(Math.pow(-1.0, k+1.0));
-					if(gasRows.get(count) + rowMod >=0 && gasRows.get(count) + rowMod <map.getTiles()[0].length && gasCols.get(count) + colMod >=0 && gasCols.get(count) + colMod <map.getTiles().length && (i != 1 && k!= 0)) {
-						if(!(map.getTiles()[gasCols.get(count) + colMod][gasRows.get(count) + rowMod] instanceof Water) && !(map.getTiles()[gasCols.get(count) + colMod][gasRows.get(count) + rowMod].isSolid()) && !(map.getTiles()[gasCols.get(count) + colMod][gasRows.get(count) + rowMod] instanceof Gas)) {
-							
+					colMod = (k == 0? 0 : 1) * (int)(Math.pow(-1.0, k+1.0));
+					if(gasRows.get(count) + rowMod >=0 && gasRows.get(count) + rowMod <map.getTiles()[0].length && gasCols.get(count) + colMod >=0 && gasCols.get(count) + colMod <map.getTiles().length) {
+					 	if(rowMod==0 && colMod== 0) {
+
+						}
+						else {
+							if(!(map.getTiles()[gasCols.get(count) + colMod][gasRows.get(count) + rowMod] instanceof Water) && !(map.getTiles()[gasCols.get(count) + colMod][gasRows.get(count) + rowMod].isSolid()) && !(map.getTiles()[gasCols.get(count) + colMod][gasRows.get(count) + rowMod] instanceof Gas)) {
+								if(total<numSquaresToFill) {
+									Gas g = new Gas(gasCols.get(count) + colMod, gasRows.get(count) + rowMod, tileSize, tileset.getImage("GasOne"), this, 0);
+					 				map.addTile(gasCols.get(count) + colMod, gasRows.get(count) + rowMod, g);
+					 				gasRows.add(gasRows.get(count) + rowMod);
+					 				gasCols.add(gasCols.get(count) + colMod);
+									total++;
+								}
+							}
 						}
 					}
 				}
 			}
 			count++;
+			System.out.println("next");
 			if(count >= gasRows.size()) {
 				canSpread = false;
 			}
