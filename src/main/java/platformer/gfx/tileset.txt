@@ -22,3 +22,17 @@ tileSize=10
 19,Full_water,0,2
 20,Half_water,1,2
 21,Quarter_water,2,2
+22,Mench_Idle_Left_One,3,2
+23,Mench_Idle_Left_Two,4,2
+24,Mench_Idle_Right_One,5,2
+25,Mench_Idle_Right_Two,6,2
+26,Mench_Run_Left_One,7,2
+27,Mench_Run_Left_Two,8,2
+28,Mench_Run_Left_Three,0,3
+29,Mench_Run_Right_One,1,3
+30,Mench_Run_Right_Two,2,3
+31,Mench_Run_Right_Three,3,3
+32,Mench_Jump_Left,4,3
+33,Mench_Fall_Left,5,3
+34,Mench_Jump_Right,6,3
+35,Mench_Fall_Right,7,3

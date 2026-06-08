@@ -13,14 +13,21 @@ import platformer.code.gamelogic.tiles.Tile;
 public class Player extends PhysicsObject{
 	public float walkSpeed = 400;
 	public float jumpPower = 1350;
-
+	private int damage = 0;
+	private int stocksLeft = 0;
+	private int maxJumps = 0;
+	private int jumpsTaken = 0;
+	private int wallJumpMax = 0;
+	private int wallJumpsTaken = 0;
+	private long wallHoldTimer = 0;
+	private long timeOnWallMax = 0;
 	private boolean isJumping = false;
 
 	public Player(float x, float y, Level level) {
 	
 		super(x, y, level.getLevelData().getTileSize(), level.getLevelData().getTileSize(), level);
 		int offset =(int)(level.getLevelData().getTileSize()*0.1); //hitbox is offset by 10% of the player size.
-		this.hitbox = new RectHitbox(this, offset,offset, width -offset, height - offset);
+		this.hitbox = new RectHitbox(this, offset,offset, width -(offset*7), height - offset);
 	}
 
 	@Override
@@ -29,6 +36,7 @@ public class Player extends PhysicsObject{
 		
 		movementVector.x = 0;
 		if(PlayerInput.isLeftKeyDown()) {
+
 			movementVector.x = -walkSpeed;
 		}
 		if(PlayerInput.isRightKeyDown()) {
@@ -42,6 +50,56 @@ public class Player extends PhysicsObject{
 		isJumping = true;
 		if(collisionMatrix[BOT] != null) isJumping = false;
 	}
+
+
+	public void damageChar(int damageTaken) {
+		damage+=damageTaken;
+	}
+
+
+	public void launchChar(int launch, int direction, int damageTaken) {
+		if(direction == 0) {
+			movementVector.x = 0;
+			movementVector.y = (float)(-1*(1+.01*damage)*launch);
+			damage+=damageTaken;
+		}
+		else if(direction == 1) {
+			movementVector.x = (float)((1+.01*damage)*launch/2);
+			movementVector.y = (float)(-1*(1+.01*damage)*launch/2);
+			damage+=damageTaken;
+		}
+		else if(direction == 2) {
+			movementVector.x = (float)((1+.01*damage)*launch);
+			movementVector.y = 0;
+			damage+=damageTaken;
+		}
+		else if(direction == 3) {
+			movementVector.x = (float)((1+.01*damage)*launch/2);
+			movementVector.y = (float)((1+.01*damage)*launch/2);
+			damage+=damageTaken;
+		}
+		else if(direction == 4) {
+			movementVector.x = 0;
+			movementVector.y = (float)((1+.01*damage)*launch);
+			damage+=damageTaken;
+		}
+		else if(direction == 5) {
+			movementVector.x = (float)(-1*(1+.01*damage)*launch/2);
+			movementVector.y = (float)((1+.01*damage)*launch/2);
+			damage+=damageTaken;
+		}
+		else if(direction == 6) {
+			movementVector.x = (float)(-1*(1+.01*damage)*launch);
+			movementVector.y = 0;
+			damage+=damageTaken;
+		}
+		else if(direction == 7) {
+			movementVector.x = (float)(-1*(1+.01*damage)*launch/2);
+			movementVector.y = (float)(-1*(1+.01*damage)*launch/2);
+			damage+=damageTaken;
+		}
+	}
+
 
 	@Override
 	public void draw(Graphics g) {

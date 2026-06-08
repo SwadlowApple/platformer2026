@@ -35,6 +35,7 @@ public class Level {
 
 	private ArrayList<Enemy> enemiesList = new ArrayList<>();
 	private ArrayList<Flower> flowers = new ArrayList<>();
+	private ArrayList<Water> waters = new ArrayList<>();
 
 	private List<PlayerDieListener> dieListeners = new ArrayList<>();
 	private List<PlayerWinListener> winListeners = new ArrayList<>();
@@ -45,6 +46,8 @@ public class Level {
 	private int tileSize;
 	private Tileset tileset;
 	public static float GRAVITY = 70;
+	private long waterTimer = 0;
+	private long timeAmount = 5;
 
 	public Level(LevelData leveldata) {
 		this.leveldata = leveldata;
@@ -175,6 +178,25 @@ public class Level {
 					i--;
 				}
 			}
+			boolean touchingWater = false;
+			for (int i = 0; i < waters.size(); i++) {
+				if (waters.get(i).getHitbox().isIntersecting(player.getHitbox())) {
+					touchingWater = true;
+					//whatever water do it do here
+					if(waterTimer == 0) {
+						waterTimer = System.currentTimeMillis();
+					}
+					else {
+						if((System.currentTimeMillis()-waterTimer)/1000>=timeAmount) {
+							waterTimer = 0;
+							//water boutta water
+						}
+					}
+				}
+			}
+			if(!touchingWater){
+				//currently out of water
+			}
 
 			// Update the enemies
 			for (int i = 0; i < enemies.length; i++) {
@@ -236,18 +258,22 @@ public class Level {
 		if(fullness== 3) {
 			Water w = new Water(col, row, tileSize, tileset.getImage("Full_water"), this, fullness);
 			map.addTile(col, row, w);
+			waters.add(w);
 		}
 		else if(fullness== 2) {
 			Water w = new Water(col, row, tileSize, tileset.getImage("Half_water"), this, fullness);
 			map.addTile(col, row, w);
+			waters.add(w);
 		}
 		else if(fullness== 1) {
 			Water w = new Water(col, row, tileSize, tileset.getImage("Quarter_water"), this, fullness);
 			map.addTile(col, row, w);
+			waters.add(w);
 		}
 		else{
 			Water w = new Water(col, row, tileSize, tileset.getImage("Falling_water"), this, fullness);
 			map.addTile(col, row, w);
+			waters.add(w);
 		}
 		if(fullness==0) {
 			if (row+2 < map.getTiles()[0].length && !(map.getTiles()[col][row+1] instanceof Water) && !map.getTiles()[col][row+1].isSolid() && map.getTiles()[col][row+2].isSolid()) {
