@@ -11,9 +11,13 @@ import platformer.code.gamelogic.level.Level;
 import platformer.code.gamelogic.tiles.Tile;
 
 public class Player extends PhysicsObject{
-	public float walkSpeed = 400;
-	public float jumpPower = 1350;
+	private float walkSpeed = 600;
+	private int walkChange = 100;
+	private int slowMuffin = 10;
+	private float accSpeedX = 0;
+	private float jumpPower = 1350;
 	private int damage = 0;
+	private boolean dashing = false;
 	private int stocksLeft = 0;
 	private int maxJumps = 0;
 	private int jumpsTaken = 0;
@@ -36,12 +40,45 @@ public class Player extends PhysicsObject{
 		
 		movementVector.x = 0;
 		if(PlayerInput.isLeftKeyDown()) {
-
-			movementVector.x = -walkSpeed;
+			if(accSpeedX < -walkSpeed && !dashing) {
+				accSpeedX += slowMuffin;
+				if(accSpeedX > -walkSpeed) {
+					accSpeedX = -walkSpeed;
+				}
+			}
+			else if (accSpeedX > -walkSpeed) {
+				accSpeedX -= walkChange;
+				if(accSpeedX < -walkSpeed) {
+					accSpeedX = -walkSpeed;
+				}
+			}
+			else {
+				accSpeedX = -walkSpeed;
+			}
 		}
 		if(PlayerInput.isRightKeyDown()) {
-			movementVector.x = +walkSpeed;
+			if(accSpeedX > walkSpeed && !dashing) {
+				accSpeedX -= slowMuffin;
+				if(accSpeedX < walkSpeed) {
+					accSpeedX = walkSpeed;
+				}
+			}
+			else if (accSpeedX < walkSpeed) {
+				accSpeedX += walkChange;
+				if(accSpeedX > walkSpeed) {
+					accSpeedX = walkSpeed;
+				}
+			}
 		}
+		if(!PlayerInput.isRightKeyDown() && !PlayerInput.isLeftKeyDown()) {
+			if(accSpeedX >= -100 && accSpeedX <= 100) {
+				accSpeedX = 0;
+			}
+			else {
+				accSpeedX -= (int)(accSpeedX/2);
+			}
+		}
+		movementVector.x = accSpeedX;
 		if(PlayerInput.isJumpKeyDown() && !isJumping) {
 			movementVector.y = -jumpPower;
 			isJumping = true;
@@ -49,6 +86,8 @@ public class Player extends PhysicsObject{
 		
 		isJumping = true;
 		if(collisionMatrix[BOT] != null) isJumping = false;
+		//if(movementVector.x != 0)
+		//System.out.println(movementVector.x);
 	}
 
 
