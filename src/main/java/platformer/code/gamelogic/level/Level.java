@@ -36,6 +36,7 @@ public class Level {
 	private ArrayList<Enemy> enemiesList = new ArrayList<>();
 	private ArrayList<Flower> flowers = new ArrayList<>();
 	private ArrayList<Water> waters = new ArrayList<>();
+	private ArrayList<Gas> gasses = new ArrayList<>();
 
 	private List<PlayerDieListener> dieListeners = new ArrayList<>();
 	private List<PlayerWinListener> winListeners = new ArrayList<>();
@@ -48,7 +49,13 @@ public class Level {
 	public static float GRAVITY = 70;
 	private long waterTimer = 0;
 	private long timeAmount = 5;
-
+	private long idleTimer = 0;
+	private int frame = 0;
+	private boolean faceRight = true;
+	private long gasTimer = 0;
+	private long iFrameCounter = 0;
+	private double iFrames = 0;
+	private boolean vulnerable = true;
 	public Level(LevelData leveldata) {
 		this.leveldata = leveldata;
 		mapdata = leveldata.getMapdata();
@@ -63,6 +70,8 @@ public class Level {
 	}
 
 	public void restartLevel() {
+		gasses.clear();
+		waters.clear();
 		int[][] values = mapdata.getValues();
 		Tile[][] tiles = new Tile[width][height];
 
@@ -154,19 +163,73 @@ public class Level {
 	public void update(float tslf) {
 		if (active) {
 			// Update the player
+			if(!vulnerable) {
+				if((System.currentTimeMillis() - iFrameCounter)/1000 >= iFrames) {
+					vulnerable = true;
+				}
+			}
+			if(idleTimer == 0) {
+						idleTimer = System.currentTimeMillis();
+					}
+					else {
+						if((System.currentTimeMillis()-idleTimer)/1000>=1) {
+						idleTimer = 0;
+						if(frame == 0) {
+
+						}
+						else if(frame == 1) {
+
+						}
+						else if(frame == 2) {
+
+						}
+				}
+			}
 			player.update(tslf);
 
 			// Player death
 			if (map.getFullHeight() + 100 < player.getY())
 				onPlayerDeath();
 			if (player.getCollisionMatrix()[PhysicsObject.BOT] instanceof Spikes)
-				onPlayerDeath();
+				if(vulnerable) {
+					player.launchChar(1000, 4, 20, .5);
+					iFrameCounter = System.currentTimeMillis();
+					iFrames = .5;
+					vulnerable = false;
+				}
+				if(!player.liveThis()) {
+					onPlayerDeath();
+				}
 			if (player.getCollisionMatrix()[PhysicsObject.TOP] instanceof Spikes)
-				onPlayerDeath();
+				if(vulnerable) {
+					player.launchChar(1000, 0, 20, .5);
+					iFrameCounter = System.currentTimeMillis();
+					iFrames = .5;
+					vulnerable = false;
+				}
+				if(!player.liveThis()) {
+					onPlayerDeath();
+				}
 			if (player.getCollisionMatrix()[PhysicsObject.LEF] instanceof Spikes)
-				onPlayerDeath();
+				if(vulnerable) {
+					player.launchChar(1000, 6, 20, .5);
+					iFrameCounter = System.currentTimeMillis();
+					iFrames = .5;
+					vulnerable = false;
+				}
+				if(!player.liveThis()) {
+					onPlayerDeath();
+				}
 			if (player.getCollisionMatrix()[PhysicsObject.RIG] instanceof Spikes)
-				onPlayerDeath();
+				if(vulnerable) {
+					player.launchChar(1000, 2, 20, .5);
+					iFrameCounter = System.currentTimeMillis();
+					iFrames = .5;
+					vulnerable = false;
+				}
+				if(!player.liveThis()) {
+					onPlayerDeath();
+				}
 
 			for (int i = 0; i < flowers.size(); i++) {
 				if (flowers.get(i).getHitbox().isIntersecting(player.getHitbox())) {
@@ -182,20 +245,49 @@ public class Level {
 			for (int i = 0; i < waters.size(); i++) {
 				if (waters.get(i).getHitbox().isIntersecting(player.getHitbox())) {
 					touchingWater = true;
-					//whatever water do it do here
-					if(waterTimer == 0) {
-						waterTimer = System.currentTimeMillis();
-					}
-					else {
-						if((System.currentTimeMillis()-waterTimer)/1000>=timeAmount) {
-							waterTimer = 0;
-							//water boutta water
+				}
+				
+			}
+			if(touchingWater){
+				
+				if(waterTimer == 0) {
+					waterTimer = System.currentTimeMillis();
+				}
+				else {
+					if((System.currentTimeMillis()-waterTimer)/1000>=timeAmount) {
+						waterTimer = 0;
+						player.damageChar(-5);
+						if(!player.liveThis()) {
+							onPlayerDeath();
 						}
 					}
 				}
 			}
-			if(!touchingWater){
-				//currently out of water
+			else {
+				waterTimer = 0;
+			}
+			boolean touchingGas = false;
+			for (int i = 0; i < gasses.size(); i++) {
+				if (gasses.get(i).getHitbox().isIntersecting(player.getHitbox())) {
+					touchingGas = true;
+				}
+			}
+			if(touchingGas) {
+				if(gasTimer == 0) {
+					gasTimer = System.currentTimeMillis();
+				}
+				else {
+					if((System.currentTimeMillis()-gasTimer)/1000>=2) {
+						gasTimer = 0;
+						player.damageChar(10);
+						if(!player.liveThis()) {
+							onPlayerDeath();
+						}
+					}
+				}
+			}
+			else {
+				gasTimer = 0;
 			}
 
 			// Update the enemies
@@ -317,6 +409,7 @@ public class Level {
 		ArrayList<Integer> gasCols = new ArrayList<>();
 		Gas h = new Gas(col, row, tileSize, tileset.getImage("GasOne"), this, 0);
 		map.addTile(col, row, h);
+		gasses.add(h);
 		int count = 0;
 		int rowMod = 0;
 		int colMod = 0;
@@ -340,6 +433,7 @@ public class Level {
 					 				map.addTile(gasCols.get(count) + colMod, gasRows.get(count) + rowMod, g);
 					 				gasRows.add(gasRows.get(count) + rowMod);
 					 				gasCols.add(gasCols.get(count) + colMod);
+									gasses.add(g);
 									total++;
 								}
 							}
