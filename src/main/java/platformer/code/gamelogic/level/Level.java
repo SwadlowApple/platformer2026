@@ -11,7 +11,7 @@ import platformer.code.gameengine.loaders.Tileset;
 import platformer.code.gamelogic.GameResources;
 import platformer.code.gamelogic.Main;
 import platformer.code.gamelogic.enemies.Enemy;
-import platformer.code.gamelogic.player.Player;
+import platformer.code.gamelogic.player.*;
 import platformer.code.gamelogic.tiledMap.Map;
 import platformer.code.gamelogic.tiles.Flag;
 import platformer.code.gamelogic.tiles.Flower;
@@ -175,7 +175,9 @@ public class Level {
 						if((System.currentTimeMillis()-idleTimer)/1000>=1) {
 						idleTimer = 0;
 						if(frame == 0) {
+							if(PlayerInput.isRightKeyDown()) {
 
+							}
 						}
 						else if(frame == 1) {
 
